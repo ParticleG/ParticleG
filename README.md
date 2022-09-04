@@ -2,7 +2,7 @@
 
 ### Hi there 👋
 
-- 🔭 I’m currently working on [Techluster](https://github.com/26F-Studio/Techluster) project
+- 🔭 I’m currently working on [Techluster](https://github.com/26F-Studio/Techluster) and [Techrater](https://github.com/26F-Studio/Techrater) project
 - 🌱 I’m currently learning `Unity` and `Qt`
 - ✏️ I’m currently using `JavaScript`, `C++`, `Python`, `C#`
 - 📬 Contact me: [Twitter](https://twitter.com/Partic1e_G), [QQ](http://wpa.qq.com/msgrd?v=3&uin=1135989508)
