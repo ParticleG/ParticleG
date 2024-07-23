@@ -5,7 +5,11 @@
 
 import { configure } from 'quasar/wrappers';
 import { fileURLToPath } from 'node:url';
+import { readFileSync, writeFileSync } from 'fs';
+import { sync } from 'globby';
+import { resolve } from 'path';
 
+// noinspection JSUnusedGlobalSymbols
 export default configure((ctx) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -14,7 +18,7 @@ export default configure((ctx) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'axios'],
+    boot: ['axios', 'bus', 'i18n', 'ws'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -35,6 +39,36 @@ export default configure((ctx) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      afterBuild(params) {
+        const distDir = params.quasarConf.build?.distDir;
+        if (distDir && process.env.DEPLOY_GITHUB_PAGE) {
+          const indexHtml = readFileSync(
+            resolve(distDir, 'index.html'),
+          ).toString();
+          const newHtml = indexHtml.replace(
+            'href="/manifest.json"',
+            'href="manifest.json"',
+          );
+          writeFileSync(resolve(distDir, 'index.html'), newHtml);
+
+          const paths = sync([resolve(distDir, '**/*.js').replace(/\\/g, '/')]);
+          paths.forEach((path) => {
+            const content = readFileSync(path).toString();
+            if (content.includes('/sw.js')) {
+              const newContent = content.replace('/sw.js', 'sw.js');
+              writeFileSync(path, newContent);
+            }
+          });
+        }
+      },
+
+      alias: {
+        css: fileURLToPath(new URL('./src/css', import.meta.url)),
+        constants: fileURLToPath(new URL('./src/constants', import.meta.url)),
+        types: fileURLToPath(new URL('./src/types', import.meta.url)),
+        utils: fileURLToPath(new URL('./src/utils', import.meta.url)),
+      },
+
       target: {
         browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
         node: 'node20',
@@ -56,7 +90,9 @@ export default configure((ctx) => {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf(viteConf) {
+        viteConf.base = process.env.DEPLOY_GITHUB_PAGE ? '/meshwork/' : '/';
+      },
       // viteVuePluginOptions: {},
 
       vitePlugins: [
@@ -72,7 +108,7 @@ export default configure((ctx) => {
 
             ssr: ctx.modeName === 'ssr',
 
-            // you need to set i18n resource including paths !
+            // you need to set i18n resource including paths!
             include: [fileURLToPath(new URL('./src/i18n', import.meta.url))],
           },
         ],
@@ -94,7 +130,7 @@ export default configure((ctx) => {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: true, // opens browser window automatically
+      open: true, // opens a browser window automatically
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
@@ -104,7 +140,7 @@ export default configure((ctx) => {
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 
-      // For special cases outside of where the auto-import strategy can have an impact
+      // For special cases outside where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
       // you can manually specify Quasar components/directives to be available everywhere:
       //
@@ -112,7 +148,7 @@ export default configure((ctx) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify'],
     },
 
     // animations: 'all', // --- includes all animations
@@ -164,8 +200,8 @@ export default configure((ctx) => {
       // swFilename: 'sw.js',
       // manifestFilename: 'manifest.json'
       // extendManifestJson (json) {},
-      // useCredentialsForManifestTag: true,
-      // injectPwaMetaTags: false,
+      useCredentialsForManifestTag: false,
+      injectPwaMetaTags: true,
       // extendPWACustomSWConf (esbuildConf) {},
       // extendGenerateSWOptions (cfg) {},
       // extendInjectManifestOptions (cfg) {}
