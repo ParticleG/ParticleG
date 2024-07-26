@@ -1,6 +1,6 @@
-## Hi, There 👋
+### Hi, There 👋
 
-### I'm a co-developer of [26F-Studio](https://github.com/26F-Studio), mainly focused on webpage, workflow and backend designs.
+I'm a co-developer of [26F-Studio](https://github.com/26F-Studio), mainly focused on webpage, workflow and backend designs.
 
 - 🔭 Currently working on [meshwork](https://github.com/ParticleG/meshwork) project
 - 📺 Video channel: [BiliBili](https://space.bilibili.com/3306106)
