@@ -91,7 +91,7 @@ export default configure((ctx) => {
       // distDir
 
       extendViteConf(viteConf) {
-        viteConf.base = process.env.DEPLOY_GITHUB_PAGE ? '/meshwork/' : '/';
+        viteConf.base = process.env.DEPLOY_GITHUB_PAGE ? '/ParticleG/' : '/';
       },
       // viteVuePluginOptions: {},
 
