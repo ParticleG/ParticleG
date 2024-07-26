@@ -18,6 +18,15 @@ const routes: RouteRecordRaw[] = [
           header: () => import('layouts/headers/MainHeader.vue'),
         },
       },
+      {
+        name: 'onebot',
+        path: 'onebot',
+        components: {
+          default: () => import('pages/OnebotPage.vue'),
+          leftDrawer: () => import('layouts/drawers/LeftMainDrawer.vue'),
+          header: () => import('layouts/headers/MainHeader.vue'),
+        },
+      },
     ],
   },
 

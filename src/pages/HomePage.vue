@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import axios from 'axios';
+import { useQuasar } from 'quasar';
 import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+
+const { dark } = useQuasar();
+const { query } = useRoute();
 
 const readMeHtml = ref('');
+const user = ref(query.user ?? 'ParticleG');
 
 onMounted(async () => {
   try {
@@ -10,9 +16,12 @@ onMounted(async () => {
       await axios.post('https://api.github.com/markdown', {
         text: (
           await axios.get(
-            'https://raw.githubusercontent.com/ParticleG/ParticleG/main/README.md',
+            `https://raw.githubusercontent.com/${user.value}/${user.value}/main/README.md`,
           )
-        ).data.replaceAll('theme=github_dark', 'theme=github_light'),
+        ).data.replaceAll(
+          /theme=(.*?)&/gm,
+          dark.isActive ? 'theme=github_dark&' : 'theme=github_light&',
+        ),
       })
     ).data;
   } catch (error) {
