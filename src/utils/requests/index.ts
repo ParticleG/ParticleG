@@ -1,11 +1,5 @@
 import { githubApi, githubRaw } from 'boot/axios';
-import { GithubUser } from 'utils/requests/types';
-
-export const getUser = async (username: string): Promise<GithubUser | undefined> => {
-  try {
-    return (await githubApi.get<GithubUser>(`/users/${username}`)).data;
-  } catch {}
-};
+import { GithubUser, GithubUserOrganization } from 'utils/requests/types';
 
 export const getProfileReadMe = async (
   username: string,
@@ -33,5 +27,23 @@ export const getProfileReadMe = async (
       content: (await githubRaw.get<string>(url)).data,
       url,
     };
+  } catch {}
+};
+
+export const getUser = async (
+  username: string,
+): Promise<GithubUser | undefined> => {
+  try {
+    return (await githubApi.get<GithubUser>(`/users/${username}`)).data;
+  } catch {}
+};
+
+export const getUserOrganizations = async (
+  username: string,
+): Promise<GithubUserOrganization[] | undefined> => {
+  try {
+    return (
+      await githubApi.get<GithubUserOrganization[]>(`/users/${username}/orgs`)
+    ).data;
   } catch {}
 };

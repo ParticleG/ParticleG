@@ -5,12 +5,19 @@ import { gfm, gfmHtml } from 'micromark-extension-gfm';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { getProfileReadMe, getUser } from 'utils/requests';
-import { GithubUser } from 'utils/requests/types';
+import {
+  getProfileReadMe,
+  getUser,
+  getUserOrganizations,
+} from 'utils/requests';
+import { GithubUser, GithubUserOrganization } from 'utils/requests/types';
 
 const { query } = useRoute();
 
 const githubUser = ref<GithubUser | null | undefined>();
+const githubUserOrganizations = ref<
+  GithubUserOrganization[] | null | undefined
+>();
 const readMe = ref<{ content: string; url: string } | null | undefined>();
 const username = ref(query.username?.toString() ?? 'ParticleG');
 
@@ -36,21 +43,27 @@ onMounted(async () => {
       githubUser.value = null;
     }
   });
+  getUserOrganizations(username.value).then((data) => {
+    if (data) {
+      githubUserOrganizations.value = data;
+    } else {
+      githubUserOrganizations.value = null;
+    }
+  });
 });
 </script>
 
 <template>
   <q-page class="row justify-center q-pa-xl">
-    <div class="row col-grow q-col-gutter-x-lg" style="max-width: 76rem">
+    <div class="row col-grow q-col-gutter-lg" style="max-width: 76rem">
       <div class="col-md-3 col-12">
         <div v-if="githubUser" class="github-font q-gutter-y-md">
           <div class="row items-center q-col-gutter-x-md">
             <div class="col-md-12 col-2">
               <q-img
-                loading="eager"
                 :src="githubUser.avatar_url"
                 style="
-                  border: 1px solid #9e9e9e;
+                  border: 1px solid #323439;
                   border-radius: 50%;
                   position: relative;
                   width: 100%;
@@ -89,7 +102,27 @@ onMounted(async () => {
             <div class="text-weight-medium">{{ githubUser.following }}</div>
             <div class="text-grey-8">following</div>
           </div>
-          <q-separator />
+          <template v-if="githubUserOrganizations">
+            <q-separator />
+            <div class="column q-gutter-y-sm">
+              <div class="text-body1 text-weight-medium">Organizations</div>
+              <div class="col-grow row q-gutter-x-xs">
+                <q-btn
+                  v-for="organization in githubUserOrganizations"
+                  :key="organization.id"
+                  color="#323439"
+                  :href="`https://github.com/${organization.login}`"
+                  outline
+                  padding="none"
+                  target="_blank"
+                >
+                  <q-avatar rounded size="lg">
+                    <q-img :src="organization.avatar_url" />
+                  </q-avatar>
+                </q-btn>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
       <div class="col-md-grow col-12">
