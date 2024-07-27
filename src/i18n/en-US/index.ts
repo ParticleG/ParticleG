@@ -13,4 +13,12 @@ export default {
       },
     },
   },
+  pages: {
+    HomePage: {
+      labels: {
+        noPublicOrganizations: 'No public organizations',
+        userNotFound: 'User "{username}" not found',
+      },
+    },
+  },
 };

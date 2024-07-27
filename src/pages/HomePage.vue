@@ -11,6 +11,8 @@ import {
   getUserOrganizations,
 } from 'utils/requests';
 import { GithubUser, GithubUserOrganization } from 'utils/requests/types';
+import { createI18n } from 'utils/common';
+import { useI18n } from 'vue-i18n';
 
 const { query } = useRoute();
 
@@ -20,6 +22,8 @@ const githubUserOrganizations = ref<
 >();
 const readMe = ref<{ content: string; url: string } | null | undefined>();
 const username = ref(query.username?.toString() ?? 'ParticleG');
+
+const i18n = createI18n(useI18n(), 'pages.HomePage.');
 
 onMounted(async () => {
   getProfileReadMe(username.value).then((data) => {
@@ -55,7 +59,11 @@ onMounted(async () => {
 
 <template>
   <q-page class="row justify-center q-pa-xl">
-    <div class="row col-grow q-col-gutter-lg" style="max-width: 76rem">
+    <div
+      v-if="githubUser !== null"
+      class="row col-grow q-col-gutter-lg"
+      style="max-width: 76rem"
+    >
       <div class="col-md-3 col-12">
         <div v-if="githubUser" class="github-font q-gutter-y-md">
           <div class="row items-center q-col-gutter-x-md">
@@ -120,16 +128,19 @@ onMounted(async () => {
                     <q-img :src="organization.avatar_url" />
                   </q-avatar>
                 </q-btn>
+                <div
+                  v-if="!githubUserOrganizations.length"
+                  class="text-body1 text-grey-8 text-italic text-weight-thin"
+                >
+                  {{ i18n('labels.noPublicOrganizations') }}
+                </div>
               </div>
             </div>
           </template>
         </div>
       </div>
       <div class="col-md-grow col-12">
-        <q-card
-          bordered
-          flat
-        >
+        <q-card bordered flat>
           <q-card-section>
             <q-breadcrumbs color="primary">
               <q-breadcrumbs-el
@@ -162,7 +173,44 @@ onMounted(async () => {
         </q-card>
       </div>
     </div>
+    <div v-else class="absolute-center">
+      <div class="column items-center q-gutter-y-xl">
+        <q-btn
+          class="rotate-button"
+          color="grey"
+          icon="account_circle"
+          round
+          padding="none"
+          size="35vmin"
+          unelevated
+        >
+          <q-icon
+            class="absolute-center"
+            color="white"
+            name="question_mark"
+            size="15vmin"
+            style="top: 33%"
+          />
+        </q-btn>
+        <div
+          class="text-grey text-italic text-weight-medium"
+          style="font-size: 5vmin"
+        >
+          {{ i18n('labels.userNotFound', { username }) }}
+        </div>
+      </div>
+    </div>
   </q-page>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.rotate-button {
+  transform: rotate(1turn);
+  transition: 1s;
+}
+
+.rotate-button:active {
+  transform: rotate(0);
+  transition: 0s;
+}
+</style>
