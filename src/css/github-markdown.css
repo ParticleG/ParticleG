@@ -6,7 +6,7 @@
   -webkit-text-size-adjust: 100%;
   margin: 0;
   color: #e6edf3;
-  background-color: #0d1117;
+  background-color: transparent;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
   font-size: 16px;
   line-height: 1.5;
@@ -107,7 +107,7 @@
   border-style: none;
   max-width: 100%;
   box-sizing: content-box;
-  background-color: #0d1117;
+  background-color: transparent;
 }
 
 .github-markdown-dark code,
@@ -578,7 +578,7 @@
 }
 
 .github-markdown-dark table tr {
-  background-color: #0d1117;
+  background-color: transparent;
   border-top: 1px solid #30363db3;
 }
 
@@ -774,7 +774,7 @@
 .github-markdown-dark .csv-data .blob-num {
   padding: 10px 0.5rem 9px;
   text-align: right;
-  background: #0d1117;
+  background: transparent;
   border: 0;
 }
 

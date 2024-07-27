@@ -126,7 +126,10 @@ onMounted(async () => {
         </div>
       </div>
       <div class="col-md-grow col-12">
-        <q-card bordered flat>
+        <q-card
+          bordered
+          flat
+        >
           <q-card-section>
             <q-breadcrumbs color="primary">
               <q-breadcrumbs-el

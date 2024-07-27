@@ -5,5 +5,12 @@ export default {
         navigations: { home: 'Home' },
       },
     },
+    headers: {
+      MainHeader: {
+        labels: {
+          toggleDarkMode: 'Toggle Dark Mode',
+        },
+      },
+    },
   },
 };
