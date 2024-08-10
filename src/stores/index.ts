@@ -28,7 +28,7 @@ export default store((/* { ssrContext } */) => {
   pinia.use(
     createPersistedState({
       auto: true,
-      key: (id) => `particleg.${id}`,
+      key: (id) => `ParticleG.ParticleG.${id}`,
     }),
   );
   return pinia;

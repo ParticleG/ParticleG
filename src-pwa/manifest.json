@@ -1,18 +1,10 @@
 {
   "background_color": "#ffffff",
-  "categories": [
-    "personalization",
-    "social",
-    "utilities"
-  ],
+  "categories": ["personalization", "social", "utilities"],
   "description": "Particle_G's Personal Homepage",
   "dir": "ltr",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui",
-    "browser"
-  ],
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "icons": [
     {
       "src": "icons/icon-128x128.png",
