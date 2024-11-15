@@ -23,6 +23,18 @@ const navigations: Navigation[] = [
     available: true,
     route: 'home',
   },
+  {
+    label: 'aurora',
+    icon: 'mdi-aurora',
+    available: true,
+    route: 'aurora',
+  },
+  {
+    label: 'onebot',
+    icon: 'android',
+    available: false,
+    route: 'onebot',
+  }
 ];
 </script>
 
@@ -41,9 +53,9 @@ const navigations: Navigation[] = [
     <q-list separator>
       <template v-for="navigation in navigations" :key="navigation">
         <q-item
-          :clickable="navigation.available"
-          :v-ripple="navigation.available"
-          @click="$router.push(navigation.route)"
+          :disable="!navigation.available"
+          exact
+          :to="navigation.route"
         >
           <q-item-section avatar>
             <q-icon

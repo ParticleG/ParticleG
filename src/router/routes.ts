@@ -10,6 +10,15 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
+        name: 'aurora',
+        path: 'aurora',
+        components: {
+          default: () => import('pages/AuroraPage.vue'),
+          leftDrawer: () => import('layouts/drawers/LeftMainDrawer.vue'),
+          header: () => import('layouts/headers/MainHeader.vue'),
+        },
+      },
+      {
         name: 'home',
         path: 'home',
         components: {

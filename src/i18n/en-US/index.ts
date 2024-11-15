@@ -2,7 +2,7 @@ export default {
   layouts: {
     drawers: {
       LeftMainDrawer: {
-        navigations: { home: 'Home' },
+        navigations: { aurora: 'Aurora', home: 'Home', onebot: 'OneBot' },
       },
     },
     headers: {

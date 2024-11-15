@@ -13,7 +13,9 @@ import {
 import { GithubUser, GithubUserOrganization } from 'utils/requests/types';
 import { createI18n } from 'utils/common';
 import { useI18n } from 'vue-i18n';
+import { useQuasar } from 'quasar';
 
+const { dark } = useQuasar();
 const { query } = useRoute();
 
 const githubUser = ref<GithubUser | null | undefined>();
@@ -163,8 +165,8 @@ onMounted(async () => {
             <article
               v-if="readMe"
               :class="{
-                'github-markdown-dark': $q.dark.isActive,
-                'github-markdown-light': !$q.dark.isActive,
+                'github-markdown-dark': dark.isActive,
+                'github-markdown-light': !dark.isActive,
               }"
               v-html="readMe.content"
               style="max-width: calc(60vw - 10rem)"

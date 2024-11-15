@@ -6,7 +6,7 @@
 import { configure } from 'quasar/wrappers';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync } from 'fs';
-import { sync } from 'globby';
+import { globbySync } from 'globby';
 import { resolve } from 'path';
 
 // noinspection JSUnusedGlobalSymbols
@@ -51,7 +51,7 @@ export default configure((ctx) => {
           );
           writeFileSync(resolve(distDir, 'index.html'), newHtml);
 
-          const paths = sync([resolve(distDir, '**/*.js').replace(/\\/g, '/')]);
+          const paths = globbySync([resolve(distDir, '**/*.js').replace(/\\/g, '/')]);
           paths.forEach((path) => {
             const content = readFileSync(path).toString();
             if (content.includes('/sw.js')) {
