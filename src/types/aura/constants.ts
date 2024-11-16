@@ -44,7 +44,7 @@ const PersonSchema = z.object({
   name: z.string(),
   email: z.optional(z.string()),
   url: z.optional(z.string()),
-});
+}).or(z.string());
 
 const ProtocolSchema = z.object({
   type: z.union([

@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
 
 declare module '@vue/runtime-core' {
+  // noinspection JSUnusedGlobalSymbols
   interface ComponentCustomProperties {
     $axios: AxiosInstance;
     $api: AxiosInstance;
@@ -20,6 +21,7 @@ const githubRaw = axios.create({
   baseURL: 'https://raw.githubusercontent.com',
 });
 
+// noinspection JSUnusedGlobalSymbols
 export default boot(({ app }) => {
   app.config.globalProperties.$axios = axios;
   app.config.globalProperties.$githubApi = githubApi;

@@ -2,18 +2,17 @@
 import 'css/github-markdown.css';
 import { micromark } from 'micromark';
 import { gfm, gfmHtml } from 'micromark-extension-gfm';
+import { useQuasar } from 'quasar';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { i18nSubPath } from 'utils/common';
 import {
   getProfileReadMe,
   getUser,
   getUserOrganizations,
 } from 'utils/requests';
 import { GithubUser, GithubUserOrganization } from 'utils/requests/types';
-import { createI18n } from 'utils/common';
-import { useI18n } from 'vue-i18n';
-import { useQuasar } from 'quasar';
 
 const { dark, screen } = useQuasar();
 const { query } = useRoute();
@@ -25,7 +24,7 @@ const githubUserOrganizations = ref<
 const readMe = ref<{ content: string; url: string } | null | undefined>();
 const username = ref(query.username?.toString() ?? 'ParticleG');
 
-const i18n = createI18n(useI18n(), 'pages.HomePage.');
+const i18n = i18nSubPath('pages.HomePage');
 
 onMounted(async () => {
   getProfileReadMe(username.value).then((data) => {

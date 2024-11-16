@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useI18n } from 'vue-i18n';
 
 import { bus } from 'boot/bus';
 import { useSettingsStore } from 'stores/settings';
-import { createI18n } from 'utils/common';
+import { i18nSubPath } from 'utils/common';
 
 const { toggleDarkMode } = useSettingsStore();
 const { darkModeColorAndIcon } = storeToRefs(useSettingsStore());
 
-const i18n = createI18n(useI18n(), 'layouts.headers.MainHeader.');
+const i18n = i18nSubPath('layouts.headers.MainHeader');
 </script>
 
 <template>

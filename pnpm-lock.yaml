@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@guolao/vue-monaco-editor':
+        specifier: ^1.5.4
+        version: 1.5.4(monaco-editor@0.52.0)(vue@3.5.13(typescript@5.6.3))
       '@quasar/extras':
         specifier: ^1.16.13
         version: 1.16.13
@@ -915,6 +918,16 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
+  '@guolao/vue-monaco-editor@1.5.4':
+    resolution: {integrity: sha512-eyBAqxJeDpV4mZYZSpNvh3xUgKCld5eEe0dBtjJhsy2+L0MB6PYFZ/FbPHNwskgp2RoIpfn1DLrIhXXE3lVbwQ==}
+    peerDependencies:
+      '@vue/composition-api': ^1.7.1
+      monaco-editor: '>=0.43.0'
+      vue: ^2.6.14 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
     engines: {node: '>=10.10.0'}
@@ -1019,6 +1032,11 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@monaco-editor/loader@1.4.0':
+    resolution: {integrity: sha512-00ioBig0x642hytVspPl7DbQyaSWRaolYie/UFNjoTdvoKPzo6xrXLhTk9ixgIKcLH5b5vDOjVNiGyY+uDCUlg==}
+    peerDependencies:
+      monaco-editor: '>= 0.21.0 < 1'
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2915,6 +2933,9 @@ packages:
   mlly@1.7.3:
     resolution: {integrity: sha512-xUsx5n/mN0uQf4V548PKQ+YShA4/IW0KI1dZhrNrPCLG+xizETbHTkOa1f8/xut9JRPp8kQuMnz0oqwkTiLo/A==}
 
+  monaco-editor@0.52.0:
+    resolution: {integrity: sha512-OeWhNpABLCeTqubfqLMXGsqf6OmPU6pHM85kF3dhy6kq5hnhuVS1p3VrEW/XhWHc71P2tHyS5JFySD8mgs1crw==}
+
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
@@ -3463,6 +3484,9 @@ packages:
   stack-trace@1.0.0-pre2:
     resolution: {integrity: sha512-2ztBJRek8IVofG9DBJqdy2N5kulaacX30Nz7xmkYF6ale9WBVmIy6mFBchvGX7Vx/MyjBhx+Rcxqrj+dbOnQ6A==}
     engines: {node: '>=16'}
+
+  state-local@1.0.7:
+    resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}
 
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
@@ -4835,6 +4859,13 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
+  '@guolao/vue-monaco-editor@1.5.4(monaco-editor@0.52.0)(vue@3.5.13(typescript@5.6.3))':
+    dependencies:
+      '@monaco-editor/loader': 1.4.0(monaco-editor@0.52.0)
+      monaco-editor: 0.52.0
+      vue: 3.5.13(typescript@5.6.3)
+      vue-demi: 0.14.10(vue@3.5.13(typescript@5.6.3))
+
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
@@ -4948,6 +4979,11 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@monaco-editor/loader@1.4.0(monaco-editor@0.52.0)':
+    dependencies:
+      monaco-editor: 0.52.0
+      state-local: 1.0.7
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -7150,6 +7186,8 @@ snapshots:
       pkg-types: 1.2.1
       ufo: 1.5.4
 
+  monaco-editor@0.52.0: {}
+
   mri@1.2.0: {}
 
   ms@2.0.0: {}
@@ -7704,6 +7742,8 @@ snapshots:
   sourcemap-codec@1.4.8: {}
 
   stack-trace@1.0.0-pre2: {}
+
+  state-local@1.0.7: {}
 
   statuses@2.0.1: {}
 

@@ -1,17 +1,16 @@
-import { Composer } from 'vue-i18n';
+import { globalI18n } from 'boot/i18n';
 
-export const createI18n =
-  (
-    composer: Composer,
-    baseName: string,
-  ): ((relativePath: string, data?: Record<string, unknown>) => string) =>
+export const i18nSubPath =
+  (baseName: string) =>
   (relativePath: string, data?: Record<string, unknown>) => {
     if (data) {
-      return composer.t(baseName + relativePath, data);
+      return globalI18n.t(`${baseName}.${relativePath}`, data);
     } else {
-      return composer.t(baseName + relativePath);
+      return globalI18n.t(`${baseName}.${relativePath}`);
     }
   };
+
+export const i18nCommon = i18nSubPath('common');
 
 export const readFileText = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
