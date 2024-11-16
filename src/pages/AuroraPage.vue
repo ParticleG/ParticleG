@@ -2,10 +2,23 @@
 import { QRejectedEntry } from 'quasar';
 import { ref } from 'vue';
 
+import { parseManifest } from 'types/aura';
+
 const filesImages = ref<File>();
 
 const onChange = (file: File) => {
-  console.log('Selected file:', file);
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    if (typeof evt.target?.result === 'string') {
+      try {
+        const manifest = parseManifest(JSON.parse(evt.target.result));
+        console.log(manifest);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+  reader.readAsText(file);
 };
 
 const onRejected = (rejectedEntries: QRejectedEntry[]) => {
@@ -17,6 +30,7 @@ const onRejected = (rejectedEntries: QRejectedEntry[]) => {
   <q-page class="row justify-center q-pa-xl">
     <q-file
       accept=".json"
+      clearable
       label="Select config file"
       outlined
       v-model="filesImages"
