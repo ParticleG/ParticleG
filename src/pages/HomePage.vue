@@ -15,7 +15,7 @@ import { createI18n } from 'utils/common';
 import { useI18n } from 'vue-i18n';
 import { useQuasar } from 'quasar';
 
-const { dark } = useQuasar();
+const { dark, screen } = useQuasar();
 const { query } = useRoute();
 
 const githubUser = ref<GithubUser | null | undefined>();
@@ -60,16 +60,20 @@ onMounted(async () => {
 </script>
 
 <template>
-  <q-page class="row justify-center q-pa-xl">
+  <q-page class="row justify-center q-pa-md-xl q-pa-lg">
     <div
       v-if="githubUser !== null"
-      class="row col-grow q-col-gutter-lg"
+      class="row full-width"
+      :class="{
+        'q-col-gutter-x-lg': screen.gt.sm,
+        'q-col-gutter-y-lg': screen.lt.md,
+      }"
       style="max-width: 76rem"
     >
       <div class="col-md-3 col-12">
         <div v-if="githubUser" class="github-font q-gutter-y-md">
           <div class="row items-center q-col-gutter-x-md">
-            <div class="col-md-12 col-2">
+            <div class="col-sm-2 col-md-12 col-3">
               <q-img
                 :src="githubUser.avatar_url"
                 style="
@@ -141,35 +145,36 @@ onMounted(async () => {
           </template>
         </div>
       </div>
-      <div class="col-md-grow col-12">
+      <div class="col-md-9 col-12">
         <q-card bordered flat>
           <q-card-section>
-            <q-breadcrumbs color="primary">
-              <q-breadcrumbs-el
-                :label="username"
-                icon="person"
-                :href="`https://github.com/${username}`"
-                target="_blank"
-              />
-              <q-breadcrumbs-el
-                v-if="readMe"
-                :label="username"
-                icon="book"
-                :href="`https://github.com/${username}/${username}`"
-                target="_blank"
-              />
-              <q-breadcrumbs-el v-if="readMe" label="README.md" />
-            </q-breadcrumbs>
+            <q-scroll-area class="full-width" style="height: 1.5rem">
+              <q-breadcrumbs color="primary">
+                <q-breadcrumbs-el
+                  :label="username"
+                  icon="person"
+                  :href="`https://github.com/${username}`"
+                  target="_blank"
+                />
+                <q-breadcrumbs-el
+                  v-if="readMe"
+                  :label="username"
+                  icon="book"
+                  :href="`https://github.com/${username}/${username}`"
+                  target="_blank"
+                />
+                <q-breadcrumbs-el v-if="readMe" label="README.md" />
+              </q-breadcrumbs>
+            </q-scroll-area>
           </q-card-section>
           <q-card-section>
-            <article
+            <div
               v-if="readMe"
               :class="{
                 'github-markdown-dark': dark.isActive,
                 'github-markdown-light': !dark.isActive,
               }"
               v-html="readMe.content"
-              style="max-width: calc(60vw - 10rem)"
             />
           </q-card-section>
         </q-card>
@@ -179,7 +184,8 @@ onMounted(async () => {
       <div class="column items-center q-gutter-y-xl">
         <q-btn
           class="rotate-button"
-          color="grey"
+          :color="dark.isActive ? 'grey-7' : 'grey'"
+          :text-color="dark.isActive ? 'dark' : 'white'"
           icon="account_circle"
           round
           padding="none"
@@ -188,14 +194,15 @@ onMounted(async () => {
         >
           <q-icon
             class="absolute-center"
-            color="white"
+            :color="dark.isActive ? 'dark' : 'white'"
             name="question_mark"
             size="15vmin"
             style="top: 33%"
           />
         </q-btn>
         <div
-          class="text-grey text-italic text-weight-medium"
+          class="text-italic text-weight-medium"
+          :class="dark.isActive ? 'text-grey-7' : 'text-grey'"
           style="font-size: 5vmin"
         >
           {{ i18n('labels.userNotFound', { username }) }}
