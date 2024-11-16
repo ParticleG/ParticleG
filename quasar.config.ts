@@ -51,7 +51,9 @@ export default configure((ctx) => {
           );
           writeFileSync(resolve(distDir, 'index.html'), newHtml);
 
-          const paths = globbySync([resolve(distDir, '**/*.js').replace(/\\/g, '/')]);
+          const paths = globbySync([
+            resolve(distDir, '**/*.js').replace(/\\/g, '/'),
+          ]);
           paths.forEach((path) => {
             const content = readFileSync(path).toString();
             if (content.includes('/sw.js')) {

@@ -34,7 +34,7 @@ const navigations: Navigation[] = [
     icon: 'android',
     available: false,
     route: 'onebot',
-  }
+  },
 ];
 </script>
 
@@ -52,11 +52,7 @@ const navigations: Navigation[] = [
   >
     <q-list separator>
       <template v-for="navigation in navigations" :key="navigation">
-        <q-item
-          :disable="!navigation.available"
-          exact
-          :to="navigation.route"
-        >
+        <q-item :disable="!navigation.available" exact :to="navigation.route">
           <q-item-section avatar>
             <q-icon
               :name="navigation.icon"
