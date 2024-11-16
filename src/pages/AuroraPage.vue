@@ -3,22 +3,20 @@ import { QRejectedEntry } from 'quasar';
 import { ref } from 'vue';
 
 import { parseManifest } from 'types/aura';
+import { readFileText } from 'utils/common';
 
-const filesImages = ref<File>();
+const file = ref<File>();
+const isLoading = ref(false);
 
-const onChange = (file: File) => {
-  const reader = new FileReader();
-  reader.onload = (evt) => {
-    if (typeof evt.target?.result === 'string') {
-      try {
-        const manifest = parseManifest(JSON.parse(evt.target.result));
-        console.log(manifest);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-  reader.readAsText(file);
+const onChange = async (file: File) => {
+  isLoading.value = true;
+  try {
+    const manifest = parseManifest(JSON.parse(await readFileText(file)));
+    console.log(manifest);
+  } catch (error) {
+    console.error(error);
+  }
+  isLoading.value = false;
 };
 
 const onRejected = (rejectedEntries: QRejectedEntry[]) => {
@@ -32,8 +30,9 @@ const onRejected = (rejectedEntries: QRejectedEntry[]) => {
       accept=".json"
       clearable
       label="Select config file"
+      :loading="isLoading"
       outlined
-      v-model="filesImages"
+      v-model="file"
       @rejected="onRejected"
       @update:model-value="onChange"
     />
