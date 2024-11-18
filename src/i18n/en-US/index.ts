@@ -1,6 +1,16 @@
 export default {
   components:{
     AuroraTabPanels: {
+      FilePanel: {
+        labels: {
+          title: 'Select a manifest file (Json)',
+        },
+      },
+      TextPanel: {
+        labels: {
+          title: 'Provide manifest content here',
+        },
+      },
       UrlPanel: {
         labels: {
           title: 'Provide manifest URL here',
@@ -32,9 +42,6 @@ export default {
     AuroraPage: {
       labels: {
         loadMethod: 'Load manifest with...',
-        fileInput: 'Select a manifest file',
-        textInput: 'Provide manifest content here',
-        urlInput: 'Provide manifest URL here',
         invalidFile: 'Invalid file "{name}" with type "{type}"',
       },
       tabs: {
@@ -47,6 +54,7 @@ export default {
   common: {
     zod: {
       manifestParseError: 'Error parsing manifest: ',
+      manifestRoot: 'Manifest Root',
       path: 'Path: {path}',
       reason: 'Reason: {message}',
     },

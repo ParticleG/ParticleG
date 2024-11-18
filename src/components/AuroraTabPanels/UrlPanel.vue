@@ -32,6 +32,8 @@ const onChange = async () => {
   if (!content.value?.length) {
     return;
   }
+  const data = await axios.get(content.value)
+  console.log(data)
   const result = parseManifest((await axios.get(content.value)).data);
   if (result.success) {
     emit('resolve', result.data);

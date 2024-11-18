@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { QRejectedEntry, useQuasar } from 'quasar';
+import { QRejectedEntry } from 'quasar';
 import { reactive, ref } from 'vue';
 
 import { parseManifest, parseError } from 'types/aura';
 import { i18nCommon, i18nSubPath, readFileText } from 'utils/common';
 import { ErrorTreeNode, Manifest } from 'types/aura/types';
-import axios from 'axios';
 import UrlPanel from 'components/AuroraTabPanels/UrlPanel.vue';
 
-const { dark } = useQuasar();
 const loadMethods = ['url', 'text', 'file'];
 
 const loadMethod = ref(loadMethods[0]);
@@ -49,41 +47,6 @@ const fileInput = reactive<{
     }));
   },
 });
-const textInput = reactive<{
-  value?: string;
-  onChange: () => void;
-}>({
-  onChange: () => {
-    errors.value = [];
-    if (!textInput.value?.length) {
-      return;
-    }
-    const result = parseManifest(textInput.value);
-    if (result.success) {
-      console.log(result.data);
-    } else {
-      console.log(result.error.format());
-      errors.value = parseError(result.error);
-    }
-  },
-});
-const urlInput = reactive<{
-  value?: string;
-  onChange: () => void;
-}>({
-  onChange: async () => {
-    errors.value = [];
-    if (!urlInput.value?.length) {
-      return;
-    }
-    const result = parseManifest((await axios.get(urlInput.value)).data);
-    if (result.success) {
-      console.log(result.data);
-    } else {
-      errors.value = parseError(result.error);
-    }
-  },
-});
 </script>
 
 <template>
@@ -103,20 +66,6 @@ const urlInput = reactive<{
         </q-toolbar>
         <q-tab-panels animated v-model="loadMethod">
           <q-tab-panel name="url">
-            <!--            <div class="column q-gutter-y-md">-->
-            <!--              <div class="text-h6">-->
-            <!--                {{ i18n('labels.urlInput') }}-->
-            <!--              </div>-->
-            <!--              <q-input-->
-            <!--                autofocus-->
-            <!--                clearable-->
-            <!--                :error="!!errors.length"-->
-            <!--                hide-bottom-space-->
-            <!--                outlined-->
-            <!--                v-model="urlInput.value"-->
-            <!--                @change="urlInput.onChange"-->
-            <!--              />-->
-            <!--            </div>-->
             <url-panel
               @clear="errors = []"
               @reject="errors = $event"
@@ -124,40 +73,7 @@ const urlInput = reactive<{
             />
           </q-tab-panel>
           <q-tab-panel name="text">
-            <div class="column q-gutter-y-md">
-              <div class="text-h6">
-                {{ i18n('labels.textInput') }}
-              </div>
-              <q-field
-                autofocus
-                clearable
-                :error="!!errors.length"
-                hide-bottom-space
-                outlined
-                v-model="textInput.value"
-                @clear="
-                  textInput.value = '';
-                  textInput.onChange();
-                "
-              >
-                <template v-slot:control>
-                  <vue-monaco-editor
-                    class="self-center full-width no-outline"
-                    tabindex="0"
-                    language="json"
-                    :options="{
-                      automaticLayout: true,
-                      formatOnType: true,
-                      formatOnPaste: true,
-                    }"
-                    :theme="dark.isActive ? 'vs-dark' : 'vs'"
-                    v-model:value="textInput.value"
-                    @change="textInput.onChange"
-                    style="min-height: 10rem; max-height: 30vh"
-                  />
-                </template>
-              </q-field>
-            </div>
+
           </q-tab-panel>
           <q-tab-panel name="file">
             <div class="column q-gutter-y-md">

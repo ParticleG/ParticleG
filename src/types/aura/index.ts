@@ -4,9 +4,13 @@ import { ManifestSchema } from 'types/aura/constants';
 import { ErrorTreeNode } from 'types/aura/types';
 import { i18nCommon } from 'utils/common';
 
-export const parseManifest = (manifestString: string) => {
+export const parseManifest = (manifestData: object | string) => {
   try {
-    return ManifestSchema.safeParse(JSON.parse(manifestString));
+    return ManifestSchema.safeParse(
+      typeof manifestData === 'string'
+        ? JSON.parse(manifestData)
+        : manifestData,
+    );
   } catch (error) {
     return <SafeParseError<object>>{
       success: false,
@@ -46,12 +50,16 @@ const parseMessage = (
   }
 };
 
-export const parseError = (error: ZodError): ErrorTreeNode[] =>
-  parseMessage('root', <ErrorTree>(<unknown>error.format())).map(
-    ({ path, messages }) => ({
-      label: path,
-      children: messages.map((message) => ({
-        label: message,
-      })),
-    }),
-  );
+export const parseError = (error: ZodError): ErrorTreeNode[] => [
+  {
+    label: i18nCommon('zod.manifestRoot'),
+    children: parseMessage('', <ErrorTree>(<unknown>error.format())).map(
+      ({ path, messages }) => ({
+        label: path.substring(1),
+        children: messages.map((message) => ({
+          label: message,
+        })),
+      }),
+    ),
+  },
+];

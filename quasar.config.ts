@@ -176,7 +176,7 @@ export default configure((ctx) => {
       // (gets superseded if process.env.PORT is specified at runtime)
 
       middlewares: [
-        'render', // keep this as last one
+        'render', // keep this as the last one
       ],
 
       // extendPackageJson (json) {},
