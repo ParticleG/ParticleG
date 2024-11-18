@@ -60,6 +60,7 @@ const ProtocolSchema = z.object({
 });
 
 export const ManifestSchema = z.object({
+  edition: z.literal(1),
   name: z.string(),
   version: z.string(),
   description: z.optional(z.string()),

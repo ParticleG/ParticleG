@@ -4,14 +4,16 @@ import { reactive, ref } from 'vue';
 
 import { parseManifest, parseError } from 'types/aura';
 import { i18nCommon, i18nSubPath, readFileText } from 'utils/common';
-import { ErrorTreeNode } from 'types/aura/types';
+import { ErrorTreeNode, Manifest } from 'types/aura/types';
 import axios from 'axios';
+import UrlPanel from 'components/AuroraTabPanels/UrlPanel.vue';
 
 const { dark } = useQuasar();
 const loadMethods = ['url', 'text', 'file'];
 
 const loadMethod = ref(loadMethods[0]);
 const errors = ref<ErrorTreeNode[]>([]);
+const manifest = ref<Manifest>();
 
 const i18n = i18nSubPath('pages.AuroraPage');
 
@@ -53,13 +55,14 @@ const textInput = reactive<{
 }>({
   onChange: () => {
     errors.value = [];
-    if (!urlInput.value?.length) {
+    if (!textInput.value?.length) {
       return;
     }
-    const result = parseManifest(urlInput.value);
+    const result = parseManifest(textInput.value);
     if (result.success) {
       console.log(result.data);
     } else {
+      console.log(result.error.format());
       errors.value = parseError(result.error);
     }
   },
@@ -100,15 +103,24 @@ const urlInput = reactive<{
         </q-toolbar>
         <q-tab-panels animated v-model="loadMethod">
           <q-tab-panel name="url">
-            <q-input
-              autofocus
-              clearable
-              :error="!!errors.length"
-              hide-bottom-space
-              :label="i18n('labels.urlInput')"
-              outlined
-              v-model="urlInput.value"
-              @change="urlInput.onChange"
+            <!--            <div class="column q-gutter-y-md">-->
+            <!--              <div class="text-h6">-->
+            <!--                {{ i18n('labels.urlInput') }}-->
+            <!--              </div>-->
+            <!--              <q-input-->
+            <!--                autofocus-->
+            <!--                clearable-->
+            <!--                :error="!!errors.length"-->
+            <!--                hide-bottom-space-->
+            <!--                outlined-->
+            <!--                v-model="urlInput.value"-->
+            <!--                @change="urlInput.onChange"-->
+            <!--              />-->
+            <!--            </div>-->
+            <url-panel
+              @clear="errors = []"
+              @reject="errors = $event"
+              @resolve="manifest = $event"
             />
           </q-tab-panel>
           <q-tab-panel name="text">
@@ -124,20 +136,20 @@ const urlInput = reactive<{
                 outlined
                 v-model="textInput.value"
                 @clear="
-                textInput.value = '';
-                textInput.onChange();
-              "
+                  textInput.value = '';
+                  textInput.onChange();
+                "
               >
                 <template v-slot:control>
                   <vue-monaco-editor
-                    class="self-center full-width no-outline q-pt-md"
+                    class="self-center full-width no-outline"
                     tabindex="0"
                     language="json"
                     :options="{
-                    automaticLayout: true,
-                    formatOnType: true,
-                    formatOnPaste: true,
-                  }"
+                      automaticLayout: true,
+                      formatOnType: true,
+                      formatOnPaste: true,
+                    }"
                     :theme="dark.isActive ? 'vs-dark' : 'vs'"
                     v-model:value="textInput.value"
                     @change="textInput.onChange"
@@ -148,18 +160,22 @@ const urlInput = reactive<{
             </div>
           </q-tab-panel>
           <q-tab-panel name="file">
-            <q-file
-              accept=".json"
-              clearable
-              :error="!!errors.length"
-              hide-bottom-space
-              :label="i18n('labels.fileInput')"
-              :loading="fileInput.loading"
-              outlined
-              v-model="fileInput.value"
-              @rejected="fileInput.onReject"
-              @update:model-value="fileInput.onAccept"
-            />
+            <div class="column q-gutter-y-md">
+              <div class="text-h6">
+                {{ i18n('labels.fileInput') }}
+              </div>
+              <q-file
+                accept=".json"
+                clearable
+                :error="!!errors.length"
+                hide-bottom-space
+                :loading="fileInput.loading"
+                outlined
+                v-model="fileInput.value"
+                @rejected="fileInput.onReject"
+                @update:model-value="fileInput.onAccept"
+              />
+            </div>
           </q-tab-panel>
         </q-tab-panels>
       </q-card>

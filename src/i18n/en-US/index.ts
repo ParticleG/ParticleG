@@ -1,4 +1,13 @@
 export default {
+  components:{
+    AuroraTabPanels: {
+      UrlPanel: {
+        labels: {
+          title: 'Provide manifest URL here',
+        },
+      }
+    }
+  },
   layouts: {
     drawers: {
       LeftMainDrawer: {

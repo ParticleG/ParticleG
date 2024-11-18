@@ -21,14 +21,37 @@ export const parseManifest = (manifestString: string) => {
   }
 };
 
+type ErrorTree = { _errors: string[] } & Record<string, object>;
+
+const parseMessage = (
+  rootPath: string,
+  errorTree: ErrorTree,
+): { path: string; messages: string[] }[] => {
+  if (errorTree._errors.length) {
+    return [
+      {
+        path: rootPath,
+        messages: errorTree._errors.map((error) =>
+          i18nCommon('zod.reason', { message: error }),
+        ),
+      },
+    ];
+  } else {
+    return Object.entries(errorTree)
+      .filter(([path]) => path !== '_errors')
+      .map(([childPath, childValue]) =>
+        parseMessage(`${rootPath}.${childPath}`, <ErrorTree>childValue),
+      )
+      .flat();
+  }
+};
+
 export const parseError = (error: ZodError): ErrorTreeNode[] =>
-  Object.entries(
-    <Record<string, { _errors: string[] }>>(<unknown>error.format()),
-  )
-    .filter(([path]) => path !== '_errors')
-    .map(([path, { _errors: messages }]) => ({
-      label: i18nCommon('zod.path', { path }),
+  parseMessage('root', <ErrorTree>(<unknown>error.format())).map(
+    ({ path, messages }) => ({
+      label: path,
       children: messages.map((message) => ({
-        label: i18nCommon('zod.reason', { message }),
+        label: message,
       })),
-    }));
+    }),
+  );
