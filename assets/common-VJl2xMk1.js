@@ -1,0 +1,1 @@
+import{globalI18n as t}from"./i18n-CXk8qEp8.js";const i=r=>(e,o)=>o?t.t(`${r}.${e}`,o):t.t(`${r}.${e}`),l=i("common"),m=r=>new Promise((e,o)=>{const n=new FileReader;n.onload=s=>e(s.target?.result),n.onerror=()=>o(n.error),n.readAsText(r)});export{l as a,i,m as r};
