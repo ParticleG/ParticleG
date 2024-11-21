@@ -6,39 +6,32 @@ import { i18nSubPath } from 'utils/common';
 import { parseError, parseManifest } from 'types/aura';
 import { ErrorTreeNode, Manifest } from 'types/aura/types';
 
-const emit = defineEmits<{
-  clear: [];
-  reject: [errors: ErrorTreeNode[]];
-  resolve: [manifest: Manifest];
-}>();
+const errors = defineModel<ErrorTreeNode[]>('errors', { required: true });
+const manifest = defineModel<Manifest | undefined>('manifest', {
+  required: true,
+});
 
 const content = ref<string>();
-const error = ref(false);
 
 const i18n = i18nSubPath('components.AuroraTabPanels.UrlPanel');
-
-const setError = (errors?: ErrorTreeNode[]) => {
-  if (errors) {
-    error.value = true;
-    emit('reject', errors);
-  } else {
-    error.value = false;
-    emit('clear');
-  }
+const clear = () => {
+  content.value = '';
+  errors.value = [];
+  manifest.value = undefined;
 };
-
 const onChange = async () => {
-  setError();
   if (!content.value?.length) {
+    errors.value = [];
+    manifest.value = undefined;
     return;
   }
-  const data = await axios.get(content.value)
-  console.log(data)
   const result = parseManifest((await axios.get(content.value)).data);
   if (result.success) {
-    emit('resolve', result.data);
+    errors.value = [];
+    manifest.value = result.data;
   } else {
-    setError(parseError(result.error));
+    errors.value = parseError(result.error);
+    manifest.value = undefined;
   }
 };
 </script>
@@ -51,11 +44,12 @@ const onChange = async () => {
     <q-input
       autofocus
       clearable
-      :error="error"
+      :error="!!errors?.length"
       hide-bottom-space
       outlined
       v-model="content"
       @change="onChange"
+      @clear="clear"
     />
   </div>
 </template>

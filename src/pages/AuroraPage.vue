@@ -6,6 +6,7 @@ import { parseManifest, parseError } from 'types/aura';
 import { i18nCommon, i18nSubPath, readFileText } from 'utils/common';
 import { ErrorTreeNode, Manifest } from 'types/aura/types';
 import UrlPanel from 'components/AuroraTabPanels/UrlPanel.vue';
+import TextPanel from 'components/AuroraTabPanels/TextPanel.vue';
 
 const loadMethods = ['url', 'text', 'file'];
 
@@ -51,7 +52,7 @@ const fileInput = reactive<{
 
 <template>
   <q-page class="row justify-center q-pa-xl">
-    <div class="col-8 column">
+    <div class="col-8 column q-gutter-y-lg">
       <q-card>
         <q-toolbar>
           <q-toolbar-title>{{ i18n('labels.loadMethod') }}</q-toolbar-title>
@@ -66,14 +67,10 @@ const fileInput = reactive<{
         </q-toolbar>
         <q-tab-panels animated v-model="loadMethod">
           <q-tab-panel name="url">
-            <url-panel
-              @clear="errors = []"
-              @reject="errors = $event"
-              @resolve="manifest = $event"
-            />
+            <url-panel v-model:errors="errors" v-model:manifest="manifest" />
           </q-tab-panel>
           <q-tab-panel name="text">
-
+            <text-panel v-model:errors="errors" v-model:manifest="manifest" />
           </q-tab-panel>
           <q-tab-panel name="file">
             <div class="column q-gutter-y-md">
@@ -110,8 +107,18 @@ const fileInput = reactive<{
           />
         </q-card-section>
       </q-card>
-      <q-card v-else>
-        <q-card-section></q-card-section>
+      <q-card v-if="manifest">
+        <q-card-section>
+          <div class="text-h6">
+            {{ manifest.name }}
+          </div>
+          <div class="text-grey-8 text-h6 text-weight-thin">
+            {{ manifest.version }}
+          </div>
+          <div class="text-body1">
+            {{ manifest.description }}
+          </div>
+        </q-card-section>
       </q-card>
     </div>
   </q-page>
