@@ -36,6 +36,15 @@ const routes: RouteRecordRaw[] = [
           header: () => import('layouts/headers/MainHeader.vue'),
         },
       },
+      {
+        name: 'block-adventure',
+        path: 'block-adventure',
+        components: {
+          default: () => import('pages/BlockAdventurePage.vue'),
+          leftDrawer: () => import('layouts/drawers/LeftMainDrawer.vue'),
+          header: () => import('layouts/headers/MainHeader.vue'),
+        },
+      }
     ],
   },
 

@@ -20,3 +20,7 @@ export const readFileText = (file: File): Promise<string> => {
     reader.readAsText(file);
   });
 };
+
+export const sleep = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
