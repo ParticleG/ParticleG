@@ -28,7 +28,7 @@ watch(
       flat
       style="border-color: var(--q-primary); border-width: 2px"
     >
-      <q-scroll-area ref="logScroll" class="full-height" style="width: 200px">
+      <q-scroll-area ref="logScroll" class="full-height">
         <div
           v-for="(item, index) in modelValue"
           :key="index"

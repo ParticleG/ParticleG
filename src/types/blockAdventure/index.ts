@@ -2,9 +2,11 @@ import { Block, BlockType, Player } from 'types/blockAdventure/types';
 import { sleep } from 'utils/common';
 
 export class BlockAdventure {
+  private readonly _height: number;
   private readonly _map: Block[];
   private readonly _players: Player[];
   private readonly _interval = 500;
+  private readonly _width: number;
   private _log: string[] = [];
   private _round = 0;
   private _speed = 1.0;
@@ -13,10 +15,20 @@ export class BlockAdventure {
   constructor(map: Block[], players: Player[]) {
     this._map = map;
     this._players = players;
+    this._height = Math.max(
+      ...this._map.map((_, index) => this._calculateOffsetY(index)),
+    );
+    this._width = Math.max(
+      ...this._map.map((_, index) => this._calculateOffsetX(index)),
+    );
   }
 
   get currentPlayer() {
     return this.players[this._turn];
+  }
+
+  get height() {
+    return this._height;
   }
 
   get log() {
@@ -45,6 +57,10 @@ export class BlockAdventure {
 
   get turn() {
     return this._turn;
+  }
+
+  get width() {
+    return this._width;
   }
 
   get winner() {

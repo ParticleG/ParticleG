@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { QScrollArea, useQuasar } from 'quasar';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
+import CurrentPlayerIndicator from 'components/BlockAdventure/CurrentPlayerIndicator.vue';
+import GameLog from 'components/BlockAdventure/GameLog.vue';
+import GameBlock from 'components/BlockAdventure/GameBlock.vue';
+import GamePlayer from 'components/BlockAdventure/GamePlayer.vue';
 import { BlockAdventure } from 'types/blockAdventure';
 import { DEFAULT_MAP } from 'types/blockAdventure/constants';
 import { BlockType, Player } from 'types/blockAdventure/types';
-import GameMap from 'components/BlockAdventure/GameMap.vue';
-import GameLog from 'components/BlockAdventure/GameLog.vue';
-import { QScrollArea } from 'quasar';
-import GamePlayer from 'components/BlockAdventure/GamePlayer.vue';
-import CurrentPlayerIndicator from 'components/BlockAdventure/CurrentPlayerIndicator.vue';
 import { sleep } from 'utils/common';
 
+const { screen } = useQuasar();
+
+const isMobile = computed(() => screen.lt.md);
 const game = reactive(
   new BlockAdventure(DEFAULT_MAP, [
     new Player(1, 'Mike', 'https://cdn.quasar.dev/img/avatar1.jpg'),
@@ -20,8 +23,11 @@ const game = reactive(
   ]),
 );
 
+const boxShadow = ref('');
+const gameScrollArea = ref<QScrollArea>();
 const loading = ref(false);
 const point = ref(0);
+const size = ref(145);
 const turnPercentage = ref(0);
 const winner = ref<Player>();
 
@@ -63,11 +69,50 @@ const nextTurn = async () => {
   loading.value = false;
 };
 
+watch(
+  () => game.currentPlayer,
+  (value) => {
+    gameScrollArea.value?.setScrollPosition(
+      'horizontal',
+      value.x * size.value,
+      200,
+    );
+    gameScrollArea.value?.setScrollPosition(
+      'vertical',
+      value.y * size.value,
+      200,
+    );
+  },
+  {
+    deep: true,
+  },
+);
+
 const newGame = () => {
   loading.value = true;
   game.reset();
   winner.value = undefined;
   loading.value = false;
+};
+
+const updateBoxShadow = (info: {
+  horizontalPosition: number;
+  verticalPosition: number;
+}) => {
+  const offsetX =
+    info.horizontalPosition === 0
+      ? '-4rem'
+      : info.horizontalPosition === 1
+        ? '4rem'
+        : '0';
+  const offsetY =
+    info.verticalPosition === 0
+      ? '-4rem'
+      : info.verticalPosition === 1
+        ? '4rem'
+        : '0';
+  console.log(info);
+  boxShadow.value = `inset ${offsetX} ${offsetY} 4rem rgba(0, 255, 255, 0.5)`;
 };
 
 onMounted(() => {
@@ -76,8 +121,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-page class="column q-gutter-y-md q-px-xl q-py-md">
-    <div class="row items-center justify-center q-gutter-x-xl">
+  <q-page class="column q-gutter-y-md q-px-md q-px-md-xl q-py-md">
+    <div
+      class="row items-center q-gutter-x-xl"
+      :class="{
+        'justify-center': isMobile,
+        'justify-start': !isMobile,
+      }"
+    >
       <div class="column q-gutter-y-sm">
         <div class="text-h5 text-center">Round {{ game.round + 1 }}</div>
         <div v-if="!winner" class="text-body1 text-center">
@@ -87,6 +138,43 @@ onMounted(() => {
           {{ winner.name }} is the winner!
         </div>
       </div>
+      <game-log
+        class="col-grow col-md-2"
+        :model-value="game.log"
+        style="height: calc(20vh - 100px)"
+      />
+    </div>
+    <q-card>
+<!--      <div-->
+<!--        class="absolute-full no-pointer-events"-->
+<!--        style="z-index: 1"-->
+<!--        :style="{ boxShadow }"-->
+<!--      />-->
+      <q-scroll-area
+        ref="gameScrollArea"
+        style="height: 80vh"
+        @scroll="updateBoxShadow"
+      >
+        <game-block v-model="game" />
+        <game-player
+          v-for="(player, index) in game.players"
+          :key="index"
+          class="absolute"
+          :active="!loading && game.currentPlayer.id === player.id"
+          :offset="index * 25"
+          :model-value="player"
+        />
+        <current-player-indicator
+          class="absolute"
+          :offset="game.turn * 25"
+          v-model="game.currentPlayer"
+        />
+      </q-scroll-area>
+    </q-card>
+    <q-page-sticky
+      :position="isMobile ? 'bottom-right' : 'top'"
+      :offset="[18, 18]"
+    >
       <q-btn
         v-if="!winner"
         class="text-h5"
@@ -94,7 +182,6 @@ onMounted(() => {
         :disable="!!winner"
         :label="point"
         :loading="loading"
-        outline
         padding="none"
         :percentage="turnPercentage"
         @click="nextTurn"
@@ -103,7 +190,14 @@ onMounted(() => {
         <template v-slot:loading>
           <q-spinner-hourglass />
         </template>
-        <q-tooltip> Roll the dice</q-tooltip>
+        <q-tooltip
+          anchor="center left"
+          self="center right"
+          transition-hide="jump-right"
+          transition-show="jump-left"
+        >
+          Roll the dice
+        </q-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -114,26 +208,16 @@ onMounted(() => {
         outline
         @click="newGame"
       >
-        <q-tooltip> New Game</q-tooltip>
+        <q-tooltip
+          anchor="center left"
+          self="center right"
+          transition-hide="jump-right"
+          transition-show="jump-left"
+        >
+          New Game
+        </q-tooltip>
       </q-btn>
-      <game-log :model-value="game.log" style="height: calc(20vh - 100px)" />
-    </div>
-    <q-scroll-area class="full-width relative-position" style="height: 80vh">
-      <game-map v-model="game" />
-      <game-player
-        v-for="(player, index) in game.players"
-        :key="index"
-        class="absolute"
-        :active="!loading && game.currentPlayer.id === player.id"
-        :offset="index * 25"
-        :model-value="player"
-      />
-      <current-player-indicator
-        class="absolute"
-        :offset="game.turn * 25"
-        v-model="game.currentPlayer"
-      />
-    </q-scroll-area>
+    </q-page-sticky>
   </q-page>
 </template>
 
