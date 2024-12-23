@@ -1,37 +1,52 @@
 <script setup lang="ts">
-import { QScrollArea } from 'quasar';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 
-import { BlockAdventure, Player } from 'types/blockAdventure';
+import { BlockAdventure } from 'types/blockAdventure';
 import { DEFAULT_MAP } from 'types/blockAdventure/constants';
-import { BlockType } from 'types/blockAdventure/types';
+import { BlockType, Player } from 'types/blockAdventure/types';
+import GameMap from 'components/BlockAdventure/GameMap.vue';
+import GameLog from 'components/BlockAdventure/GameLog.vue';
+import { QScrollArea } from 'quasar';
+import GamePlayer from 'components/BlockAdventure/GamePlayer.vue';
+import CurrentPlayerIndicator from 'components/BlockAdventure/CurrentPlayerIndicator.vue';
+import { sleep } from 'utils/common';
 
 const game = reactive(
   new BlockAdventure(DEFAULT_MAP, [
-    'Player 1',
-    'Player 2',
-    'Player 3',
-    'Player 4',
+    new Player(1, 'Mike', 'https://cdn.quasar.dev/img/avatar1.jpg'),
+    new Player(2, 'Mary', 'https://cdn.quasar.dev/img/avatar2.jpg'),
+    new Player(3, 'Alice', 'https://cdn.quasar.dev/img/avatar3.jpg'),
+    new Player(4, 'John', 'https://cdn.quasar.dev/img/avatar4.jpg'),
   ]),
 );
 
-const logScroll = ref<QScrollArea>();
-const rolling = ref(false);
-const running = ref(false);
+const loading = ref(false);
 const point = ref(0);
-const size = ref(145);
+const turnPercentage = ref(0);
 const winner = ref<Player>();
 
 const nextTurn = async () => {
-  running.value = true;
+  loading.value = true;
+  turnPercentage.value = 0;
 
-  rolling.value = true;
   point.value = await game.rollDice();
-  rolling.value = false;
+  turnPercentage.value = 30;
 
-  switch (await game.move(point.value)) {
+  const nextBlockType = await game.move(point.value, () => {
+    if (turnPercentage.value < 70) {
+      turnPercentage.value += 10;
+    } else if (turnPercentage.value < 90) {
+      turnPercentage.value += 5;
+    } else if (turnPercentage.value < 100) {
+      turnPercentage.value += 1;
+    }
+  });
+  turnPercentage.value = 100;
+  await sleep(500);
+
+  switch (nextBlockType) {
     case BlockType.ReRoll: {
-      running.value = false;
+      loading.value = false;
       return;
     }
     default: {
@@ -41,27 +56,19 @@ const nextTurn = async () => {
 
   if (game.winner) {
     winner.value = game.winner;
-    running.value = false;
+    loading.value = false;
     return;
   }
   game.nextTurn();
-  running.value = false;
+  loading.value = false;
 };
 
 const newGame = () => {
+  loading.value = true;
   game.reset();
   winner.value = undefined;
+  loading.value = false;
 };
-
-watch(
-  () => game.log.length,
-  () => {
-    logScroll.value?.setScrollPercentage('vertical', 100, 200);
-  },
-  {
-    deep: true,
-  },
-);
 
 onMounted(() => {
   game.reset();
@@ -86,9 +93,10 @@ onMounted(() => {
         color="primary"
         :disable="!!winner"
         :label="point"
-        :loading="running"
+        :loading="loading"
         outline
         padding="none"
+        :percentage="turnPercentage"
         @click="nextTurn"
         style="height: 3rem; width: 3rem"
       >
@@ -108,110 +116,22 @@ onMounted(() => {
       >
         <q-tooltip> New Game</q-tooltip>
       </q-btn>
-      <div class="column" style="height: calc(20vh - 100px)">
-        <div class="text-h6">Game Log</div>
-        <q-card
-          class="col-grow"
-          bordered
-          flat
-          style="border-color: var(--q-primary); border-width: 2px"
-        >
-          <q-scroll-area ref="logScroll" class="full-height" style="width: 200px">
-            <div
-              v-for="(logItem, logIndex) in game.log"
-              :key="logIndex"
-              style="white-space: pre"
-            >
-              {{ logItem }}
-            </div>
-          </q-scroll-area>
-        </q-card>
-      </div>
+      <game-log :model-value="game.log" style="height: calc(20vh - 100px)" />
     </div>
     <q-scroll-area class="full-width relative-position" style="height: 80vh">
-      <q-card
-        v-for="(blockInfo, blockIndex) in game.map"
-        :key="blockIndex"
-        class="row justify-center items-center absolute q-pa-lg"
-        bordered
-        flat
-        style="border-width: 2px"
-        :style="{
-          left: `${blockInfo.x * size}px`,
-          top: `${blockInfo.y * size}px`,
-          height: `${size}px`,
-          width: `${size}px`,
-        }"
-      >
-        <div>
-          {{ blockInfo.label }}
-        </div>
-        <div class="absolute-bottom-left">No.{{ blockIndex }}</div>
-        <div
-          v-if="blockInfo.direction"
-          class="flex flex-center"
-          :class="{
-            'absolute-top': blockInfo.direction === 'up',
-            'absolute-bottom': blockInfo.direction === 'down',
-            'absolute-left': blockInfo.direction === 'left',
-            'absolute-right': blockInfo.direction === 'right',
-          }"
-        >
-          <q-avatar
-            class="no-pointer-events"
-            color="grey-4"
-            round
-            size="md"
-            text-color="white"
-            unelevated
-            style="z-index: 10"
-            :style="{
-              left:
-                blockInfo.direction === 'right'
-                  ? '18px'
-                  : blockInfo.direction === 'left'
-                    ? '-18px'
-                    : 0,
-              top:
-                blockInfo.direction === 'down'
-                  ? '18px'
-                  : blockInfo.direction === 'up'
-                    ? '-18px'
-                    : 0,
-            }"
-          >
-            <q-icon :name="`mdi-chevron-${blockInfo.direction}`" size="md" />
-          </q-avatar>
-        </div>
-      </q-card>
-      <q-avatar
+      <game-map v-model="game" />
+      <game-player
         v-for="(player, index) in game.players"
         :key="index"
         class="absolute"
-        :color="['red', 'blue', 'purple', 'orange'][index]"
-        size="md"
-        text-color="white"
-        style="transition: all 0.35s ease-in-out; z-index: 100"
-        :style="{
-          left: `${5 + player.x * size + index * 35}px`,
-          top: `${10 + player.y * size}px`,
-        }"
-      >
-        {{ index + 1 }}
-        <q-tooltip anchor="top middle" self="bottom middle">
-          {{ player.name }}
-        </q-tooltip>
-      </q-avatar>
-      <q-icon
+        :active="!loading && game.currentPlayer.id === player.id"
+        :offset="index * 25"
+        :model-value="player"
+      />
+      <current-player-indicator
         class="absolute"
-        name="mdi-arrow-up-bold"
-        color="green"
-        size="md"
-        style="transition: all 0.35s ease-in-out; z-index: 100"
-        :style="{
-          left: `${5 + game.players[game.turn].x * size + (game.turn % game.players.length) * 35}px`,
-          top: `${38 + game.players[game.turn].y * size}px`,
-        }"
+        :offset="game.turn * 25"
+        v-model="game.currentPlayer"
       />
     </q-scroll-area>
   </q-page>

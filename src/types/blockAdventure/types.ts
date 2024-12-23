@@ -151,3 +151,22 @@ export type Block =
   | SkipBlock
   | ReRollBlock
   | DiceModifierBlock;
+
+export class Player {
+  id: number;
+  name: string;
+  avatar?: string;
+  position: number;
+  skip: number;
+  diceModifier?: (point: number) => number;
+  x = 0;
+  y = 0;
+
+  constructor(id: number, name: string, avatar?: string) {
+    this.id = id;
+    this.name = name;
+    this.avatar = avatar;
+    this.position = 0;
+    this.skip = 0;
+  }
+}

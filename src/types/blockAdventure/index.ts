@@ -1,30 +1,22 @@
-import { Block, BlockType } from 'types/blockAdventure/types';
+import { Block, BlockType, Player } from 'types/blockAdventure/types';
 import { sleep } from 'utils/common';
-
-export class Player {
-  name: string;
-  position: number;
-  skip: number;
-  diceModifier: (point: number) => number;
-
-  constructor(name: string) {
-    this.name = name;
-    this.position = 0;
-    this.skip = 0;
-    this.diceModifier = (point) => point;
-  }
-}
 
 export class BlockAdventure {
   private readonly _map: Block[];
   private readonly _players: Player[];
+  private readonly _interval = 500;
   private _log: string[] = [];
   private _round = 0;
+  private _speed = 1.0;
   private _turn = 0;
 
-  constructor(map: Block[], playerNames: string[]) {
+  constructor(map: Block[], players: Player[]) {
     this._map = map;
-    this._players = playerNames.map((name) => new Player(name));
+    this._players = players;
+  }
+
+  get currentPlayer() {
+    return this.players[this._turn];
   }
 
   get log() {
@@ -56,7 +48,52 @@ export class BlockAdventure {
   }
 
   get winner() {
-    return this._players.find((player) => player.position >= this._map.length - 1);
+    return this._players.find(
+      (player) => player.position >= this._map.length - 1,
+    );
+  }
+
+  async move(distance: number, stepCallback?: (blockType: BlockType) => void) {
+    const currentPlayer = this._players[this._turn];
+    if (currentPlayer.skip > 0) {
+      currentPlayer.skip--;
+      this._log.push(
+        `${currentPlayer.name} skipped this turn, ${currentPlayer.skip} skip turn(s) left`,
+      );
+      return;
+    }
+    currentPlayer.position += distance;
+    await sleep(this._interval / this._speed);
+
+    if (currentPlayer.position >= this._map.length) {
+      // Go backward for the extra distance
+      currentPlayer.position =
+        this._map.length - 1 - (currentPlayer.position - this._map.length);
+      this._log.push(
+        `${currentPlayer.name} went too far, go back to No.${currentPlayer.position} block`,
+      );
+      await sleep(this._interval / this._speed);
+    }
+
+    let nextBlock: Block | undefined = this._map[currentPlayer.position];
+    while (nextBlock) {
+      if (this._executeBlock(currentPlayer, nextBlock)) {
+        return nextBlock.type;
+      }
+      nextBlock = this._map[currentPlayer.position];
+      stepCallback?.(nextBlock.type);
+      await sleep(this._interval / this._speed);
+    }
+  }
+
+  nextTurn() {
+    this._turn++;
+    this._log.push(' ');
+    if (this._turn >= this._players.length) {
+      this._turn = 0;
+      this._round++;
+      this._log.push(`>> Round ${this._round + 1}`);
+    }
   }
 
   reset() {
@@ -75,53 +112,51 @@ export class BlockAdventure {
       setTimeout(
         () => {
           const currentPlayer = this._players[this._turn];
-          const point = currentPlayer.diceModifier(
-            Math.floor(Math.random() * 6) + 1,
-          );
+          let point = Math.floor(Math.random() * 6) + 1;
+          if (currentPlayer.diceModifier) {
+            point = currentPlayer.diceModifier(
+              Math.floor(Math.random() * 6) + 1,
+            );
+            currentPlayer.diceModifier = undefined;
+          }
           this._log.push(`${currentPlayer.name} rolled ${point}`);
           resolve(point);
         },
-        200 + Math.random() * 300,
+        100 + Math.random() * 200,
       );
     });
   }
 
-  async move(distance: number) {
-    const currentPlayer = this._players[this._turn];
-    if (currentPlayer.skip > 0) {
-      currentPlayer.skip--;
-      this._log.push(
-        `${currentPlayer.name} skipped this turn, ${currentPlayer.skip} skip turn(s) left`,
-      );
-      return;
+  setSpeed(speed: number) {
+    if (speed > 0) {
+      this._speed = speed;
+      return true;
     }
-    currentPlayer.position += distance;
-    await sleep(500);
-
-    let nextBlock: Block | undefined = this._map[currentPlayer.position];
-    while (nextBlock) {
-      if (this._executeBlock(currentPlayer, nextBlock)) {
-        return nextBlock.type;
-      }
-      nextBlock = this._map[currentPlayer.position];
-      await sleep(500);
-    }
+    return false;
   }
 
-  nextTurn() {
-    this._turn++;
-    this._log.push(' ');
-    if (this._turn >= this._players.length) {
-      this._turn = 0;
-      this._round++;
-      this._log.push(`>> Round ${this._round + 1}`);
-    }
+  private _calculateOffsetX(index: number) {
+    return (
+      this._map.slice(0, index).filter((item) => item.direction === 'right')
+        .length -
+      this._map.slice(0, index).filter((item) => item.direction === 'left')
+        .length
+    );
+  }
+
+  private _calculateOffsetY(index: number) {
+    return (
+      this._map.slice(0, index).filter((item) => item.direction === 'down')
+        .length -
+      this._map.slice(0, index).filter((item) => item.direction === 'up').length
+    );
   }
 
   private _executeBlock(player: Player, block: Block): boolean {
     switch (block.type) {
       case BlockType.Jump: {
-        const newPosition = block.data >= 0 ? block.data : this._map.length + block.data;
+        const newPosition =
+          block.data >= 0 ? block.data : this._map.length + block.data;
         player.position = newPosition;
         this._log.push(`${player.name} jumped to No.${newPosition} block`);
         return false;
@@ -142,31 +177,12 @@ export class BlockAdventure {
       }
       case BlockType.DiceModifier: {
         player.diceModifier = block.data;
-        this._log.push(
-          `${player.name} got a dice modifier: "${block.data.name}"`,
-        );
+        this._log.push(`${player.name} got a dice modifier: "${block.label}"`);
         return true;
       }
       default: {
         return true;
       }
     }
-  }
-
-  private _calculateOffsetX(index: number) {
-    return (
-      this._map.slice(0, index).filter((item) => item.direction === 'right')
-        .length -
-      this._map.slice(0, index).filter((item) => item.direction === 'left')
-        .length
-    );
-  }
-
-  private _calculateOffsetY(index: number) {
-    return (
-      this._map.slice(0, index).filter((item) => item.direction === 'down')
-        .length -
-      this._map.slice(0, index).filter((item) => item.direction === 'up').length
-    );
   }
 }
