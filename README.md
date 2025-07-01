@@ -1,8 +1,8 @@
-### Hi, There 👋
+### Hi, there 👋
 
 I'm a co-developer of [26F-Studio](https://github.com/26F-Studio), mainly focused on webpage, workflow and backend designs.
 
-- 🔭 Currently working on [meshwork](https://github.com/ParticleG/meshwork) project
+- 🔭 Currently working on  [maa-shadowverse-wb](https://github.com/ParticleG/maa-shadowverse-wb), [eros-vibe-web](https://github.com/26F-Studio/eros-vibe-web), [eros-vibe](https://github.com/26F-Studio/eros-vibe), and [tauri-plugin-bluetooth](https://github.com/26F-Studio/tauri-plugin-bluetooth) project
 - 📺 Video channel: [BiliBili](https://space.bilibili.com/3306106)
 - 📬 Contact me: [QQ](http://wpa.qq.com/msgrd?v=3&uin=1135989508), [Twitter](https://twitter.com/Partic1e_G)
 
