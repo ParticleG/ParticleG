@@ -1,0 +1,1 @@
+import{globalI18n as t}from"./i18n-D2fcLSDt.js";const i=e=>(r,o)=>o?t.t(`${e}.${r}`,o):t.t(`${e}.${r}`),a=i("common"),l=e=>new Promise((r,o)=>{const n=new FileReader;n.onload=s=>r(s.target?.result),n.onerror=()=>o(n.error),n.readAsText(e)}),u=e=>new Promise(r=>setTimeout(r,e));export{a,i,l as r,u as s};
