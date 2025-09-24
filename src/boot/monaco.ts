@@ -5,7 +5,7 @@ import { boot } from 'quasar/wrappers';
 export default boot(() => {
   loader.config({
     paths: {
-      vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0/min/vs',
+      vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs',
     },
   });
 });
